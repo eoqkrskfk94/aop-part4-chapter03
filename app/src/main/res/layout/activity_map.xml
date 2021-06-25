@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity">
 
-<!--    <fragment-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:id="@+id/mapFragment"-->
-<!--        tools:context=".MapsActivity"-->
-<!--        android:name="com.google.android.gms.maps.SupportMapFragment" />-->
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/mapFragment"
+        tools:context=".MapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
 
 <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
 <!--        android:id="@+id/currentLocationButton"-->

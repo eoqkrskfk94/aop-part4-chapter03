@@ -1,12 +1,17 @@
 package com.mj.aop_part4_chapter03
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.view.isVisible
+import com.mj.aop_part4_chapter03.MapActivity.Companion.SEARCH_RESULT_EXTRA_KEY
 import com.mj.aop_part4_chapter03.databinding.ActivityMainBinding
 import com.mj.aop_part4_chapter03.model.LocationLatLngEntity
 import com.mj.aop_part4_chapter03.model.SearchResultEntity
+import com.mj.aop_part4_chapter03.response.search.Poi
+import com.mj.aop_part4_chapter03.response.search.Pois
+import com.mj.aop_part4_chapter03.response.search.SearchResponse
 import com.mj.aop_part4_chapter03.utility.RetrofitUtil
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -33,7 +38,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         initView()
         bindViews()
         initData()
-        setData()
     }
 
     private fun initAdapter() {
@@ -55,20 +59,21 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         adapter.notifyDataSetChanged()
     }
 
-    private fun setData() {
-        val dataList = (0..10).map {
+    private fun setData(pois : Pois) {
+        val dataList = pois.poi.map {
             SearchResultEntity(
-                name = "$it",
-                fullAddress = "address $it",
+                name = it.name ?: "no name",
+                fullAddress = makeMainAddress(it),
                 locationLatLng = LocationLatLngEntity(
-                    it.toFloat(),
-                    it.toFloat()
+                    it.noorLat,
+                    it.noorLon
                 )
             )
         }
         adapter.setSearchResultList(dataList) {
-            Toast.makeText(this, "test", Toast.LENGTH_SHORT)
-                .show()
+            startActivity(Intent(this, MapActivity::class.java).apply {
+                putExtra(SEARCH_RESULT_EXTRA_KEY, it)
+            })
         }
     }
 
@@ -81,6 +86,9 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                     if(response.isSuccessful) {
                         val body = response.body()
                         withContext(Dispatchers.Main) {
+                            body?.let { searchResponse ->
+                                setData(searchResponse.searchPoiInfo.pois)
+                            }
 
                         }
                     }
@@ -90,4 +98,20 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
             }
         }
     }
+
+    private fun makeMainAddress(poi: Poi): String =
+        if (poi.secondNo?.trim().isNullOrEmpty()) {
+            (poi.upperAddrName?.trim() ?: "") + " " +
+                    (poi.middleAddrName?.trim() ?: "") + " " +
+                    (poi.lowerAddrName?.trim() ?: "") + " " +
+                    (poi.detailAddrName?.trim() ?: "") + " " +
+                    poi.firstNo?.trim()
+        } else {
+            (poi.upperAddrName?.trim() ?: "") + " " +
+                    (poi.middleAddrName?.trim() ?: "") + " " +
+                    (poi.lowerAddrName?.trim() ?: "") + " " +
+                    (poi.detailAddrName?.trim() ?: "") + " " +
+                    (poi.firstNo?.trim() ?: "") + " " +
+                    poi.secondNo?.trim()
+        }
 }
