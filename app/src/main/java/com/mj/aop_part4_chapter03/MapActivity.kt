@@ -38,6 +38,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        bindViews()
+
+    }
+
+    private fun bindViews() = with(binding) {
+        currentLocationButton.setOnClickListener {
+            getMyLocation()
+        }
     }
 
     private fun setupGoogleMap() {
